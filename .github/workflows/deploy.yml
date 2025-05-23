@@ -19,12 +19,26 @@ jobs:
 
       - name: Run Deploy Commands
         run: |
-          ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_IP }} "
-            cd /var/www/html &&
-            git pull origin main &&
-            composer install --no-interaction --no-dev --optimize-autoloader &&
-            npm install --omit=dev && # Alterado para --omit=dev
-            npm install vite --global && # Instala o Vite globalmente
-            npm run build &&
-            php artisan optimize:clear
-          "
+          ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_IP }} << 'EOF'
+            set -e # Exit immediately if any command fails
+            cd /var/www/html
+            
+            # Update code
+            git pull origin main
+            
+            # PHP dependencies
+            composer install --no-interaction --no-dev --optimize-autoloader
+            
+            # Node dependencies and build
+            sudi npm ci --omit=dev
+            sudo npm install vite
+            sudo npm run build
+            
+            # Laravel optimizations
+            sudo php artisan optimize:clear
+            sudo php artisan storage:link
+            
+            # Fix permissions
+            sudo chown -R www-data:www-data storage bootstrap/cache public/build
+            sudo chmod -R 775 storage bootstrap/cache
+          EOF
