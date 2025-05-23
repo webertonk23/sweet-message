@@ -30,7 +30,7 @@ jobs:
             composer install --no-interaction --no-dev --optimize-autoloader
             
             # Node dependencies and build
-            sudi npm ci --omit=dev
+            sudo npm ci --omit=dev
             sudo npm install vite
             sudo npm run build
             
