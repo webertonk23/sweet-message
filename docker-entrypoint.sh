@@ -1,15 +1,15 @@
-#!/bin/bash
+#!/bin/sh
 set -e
 
-# Cria o arquivo do SQLite se não existir
+# Cria o arquivo do SQLite caso use SQLite (se não, remova esta linha)
 touch /var/www/html/database/database.sqlite
 
-# Instala dependências e build
-composer install --optimize-autoloader --no-dev
-npm install && npm run build
+# Cria link simbólico storage se não existir
+if [ ! -L /var/www/html/public/storage ]; then
+    php artisan storage:link
+fi
 
-# Migrações
+# Roda migrations (sem prompt)
 php artisan migrate --force
 
-# Inicia Apache
-exec apache2-foreground
+exec "$@"
