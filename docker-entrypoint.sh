@@ -1,15 +1,15 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
-# Cria o arquivo do SQLite caso use SQLite (se não, remova esta linha)
-touch /var/www/html/database/database.sqlite
 
-# Cria link simbólico storage se não existir
+# Cria o link simbólico para storage se ainda não existir
 if [ ! -L /var/www/html/public/storage ]; then
     php artisan storage:link
 fi
-
-# Roda migrations (sem prompt)
 php artisan migrate --force
+
+# Ajusta permissões para o storage e cache, só para garantir
+chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
 exec "$@"

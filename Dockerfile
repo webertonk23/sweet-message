@@ -1,9 +1,11 @@
-# Stage 1: Node build
+# Stage 1: Node - Build assets
 FROM node:20-slim AS node
 
 WORKDIR /app
+
 COPY package*.json ./
 RUN npm install
+
 COPY . .
 RUN npm run build
 
@@ -37,7 +39,10 @@ RUN chown -R www-data:www-data /var/www/html \
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-EXPOSE 80
+ENV APP_ENV=production
+ENV APP_DEBUG=false
+
+EXPOSE 8080
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["apache2-foreground"]
